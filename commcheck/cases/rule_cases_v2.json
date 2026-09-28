@@ -1,0 +1,284 @@
+[
+  {
+    "id": "R01_payment_overdue_gold",
+    "description": "Payment overdue must always produce an escalate card",
+    "input": {
+      "outlet_name": "Metro Cash & Carry - Sector 14",
+      "tier": "Gold Account",
+      "days_since_visit": 7,
+      "last_order": "Same as usual",
+      "promo_activated": "Yes, promo is live",
+      "contract_target": "Yes, on track",
+      "payment_status": "Overdue",
+      "open_issue": "None"
+    },
+    "assertions": [
+      {
+        "type": "must_contain_card_type",
+        "value": "escalate"
+      },
+      {
+        "type": "escalate_must_have_message"
+      }
+    ]
+  },
+  {
+    "id": "R02_payment_overdue_general_trade",
+    "description": "Payment overdue escalates regardless of tier",
+    "input": {
+      "outlet_name": "Sharma General Store",
+      "tier": "General Trade",
+      "days_since_visit": 3,
+      "last_order": "Higher than usual",
+      "promo_activated": "Yes, promo is live",
+      "contract_target": "Yes, on track",
+      "payment_status": "Overdue",
+      "open_issue": "None"
+    },
+    "assertions": [
+      {
+        "type": "must_contain_card_type",
+        "value": "escalate"
+      },
+      {
+        "type": "escalate_must_have_message"
+      }
+    ]
+  },
+  {
+    "id": "R03_shortfall_is_act_today_not_escalate",
+    "description": "v2 spec: a shortfall is the rep's to influence, so it produces act_today and no escalation on its own",
+    "input": {
+      "outlet_name": "Star Bazaar - Main Branch",
+      "tier": "Silver Account",
+      "days_since_visit": 5,
+      "last_order": "Same as usual",
+      "promo_activated": "Yes, promo is live",
+      "contract_target": "Behind target",
+      "payment_status": "Current",
+      "open_issue": "None"
+    },
+    "assertions": [
+      {
+        "type": "must_contain_card_type",
+        "value": "act_today"
+      },
+      {
+        "type": "must_not_contain_card_type",
+        "value": "escalate"
+      }
+    ]
+  },
+  {
+    "id": "R13_contract_breach_escalates",
+    "description": "v2 spec: a contractual breach is above rep authority and must always escalate, with a message",
+    "input": {
+      "outlet_name": "Star Bazaar - Main Branch",
+      "tier": "Silver Account",
+      "days_since_visit": 5,
+      "last_order": "Same as usual",
+      "promo_activated": "Yes, promo is live",
+      "contract_target": "Breached",
+      "payment_status": "Current",
+      "open_issue": "None"
+    },
+    "assertions": [
+      {
+        "type": "must_contain_card_type",
+        "value": "escalate"
+      },
+      {
+        "type": "escalate_must_have_message"
+      }
+    ]
+  },
+  {
+    "id": "R04_gold_promo_not_activated",
+    "description": "Promo not activated at Gold outlet must flag opportunity",
+    "input": {
+      "outlet_name": "Walmart Supercenter - Route 9",
+      "tier": "Gold Account",
+      "days_since_visit": 6,
+      "last_order": "Same as usual",
+      "promo_activated": "No, promo not activated",
+      "contract_target": "Yes, on track",
+      "payment_status": "Current",
+      "open_issue": "None"
+    },
+    "assertions": [
+      {
+        "type": "must_contain_card_type",
+        "value": "opportunity"
+      }
+    ]
+  },
+  {
+    "id": "R05_silver_promo_not_activated",
+    "description": "Promo not activated at Silver outlet must flag opportunity",
+    "input": {
+      "outlet_name": "Target - Hoboken",
+      "tier": "Silver Account",
+      "days_since_visit": 4,
+      "last_order": "Same as usual",
+      "promo_activated": "No, promo not activated",
+      "contract_target": "Yes, on track",
+      "payment_status": "Current",
+      "open_issue": "None"
+    },
+    "assertions": [
+      {
+        "type": "must_contain_card_type",
+        "value": "opportunity"
+      }
+    ]
+  },
+  {
+    "id": "R06_bronze_promo_not_activated_UNDERSPECIFIED",
+    "description": "SPEC GAP: prompt says Gold/Silver only. Bronze behaviour is undefined. Recording actual behaviour, not asserting.",
+    "input": {
+      "outlet_name": "CVS Pharmacy - Hoboken",
+      "tier": "Bronze Account",
+      "days_since_visit": 5,
+      "last_order": "Same as usual",
+      "promo_activated": "No, promo not activated",
+      "contract_target": "Yes, on track",
+      "payment_status": "Current",
+      "open_issue": "None"
+    },
+    "assertions": [
+      {
+        "type": "observe_only",
+        "value": "opportunity"
+      }
+    ]
+  },
+  {
+    "id": "R07_general_trade_promo_not_activated_UNDERSPECIFIED",
+    "description": "SPEC GAP: General Trade promo behaviour undefined in prompt.",
+    "input": {
+      "outlet_name": "7-Eleven - Grove St",
+      "tier": "General Trade",
+      "days_since_visit": 3,
+      "last_order": "Same as usual",
+      "promo_activated": "No, promo not activated",
+      "contract_target": "Yes, on track",
+      "payment_status": "Current",
+      "open_issue": "None"
+    },
+    "assertions": [
+      {
+        "type": "observe_only",
+        "value": "opportunity"
+      }
+    ]
+  },
+  {
+    "id": "R08_act_today_triple_signal",
+    "description": "Low order + visit overdue + contract behind = act_today red flag",
+    "input": {
+      "outlet_name": "ShopRite - Bayonne",
+      "tier": "Silver Account",
+      "days_since_visit": 21,
+      "last_order": "Lower than usual",
+      "promo_activated": "Yes, promo is live",
+      "contract_target": "Behind target",
+      "payment_status": "Current",
+      "open_issue": "None"
+    },
+    "assertions": [
+      {
+        "type": "must_contain_card_type",
+        "value": "act_today"
+      }
+    ]
+  },
+  {
+    "id": "R09_healthy_outlet_still_gets_card",
+    "description": "Every outlet gets at least one card, even with no risk signals",
+    "input": {
+      "outlet_name": "Target - Jersey City Newport",
+      "tier": "Gold Account",
+      "days_since_visit": 4,
+      "last_order": "Higher than usual",
+      "promo_activated": "Yes, promo is live",
+      "contract_target": "Yes, on track",
+      "payment_status": "Current",
+      "open_issue": "None"
+    },
+    "assertions": [
+      {
+        "type": "min_card_count",
+        "value": 1
+      }
+    ]
+  },
+  {
+    "id": "R10_multi_signal_multi_card",
+    "description": "Multiple signals should produce multiple cards",
+    "input": {
+      "outlet_name": "Walmart Supercenter - North Bergen",
+      "tier": "Gold Account",
+      "days_since_visit": 19,
+      "last_order": "Lower than usual",
+      "promo_activated": "No, promo not activated",
+      "contract_target": "Behind target",
+      "payment_status": "Overdue",
+      "open_issue": "Buyer on maternity leave, temp buyer in place"
+    },
+    "assertions": [
+      {
+        "type": "min_card_count",
+        "value": 2
+      },
+      {
+        "type": "must_contain_card_type",
+        "value": "escalate"
+      },
+      {
+        "type": "escalate_must_have_message"
+      }
+    ]
+  },
+  {
+    "id": "R11_no_escalation_message_on_non_escalate",
+    "description": "escalation_message should only appear on escalate cards",
+    "input": {
+      "outlet_name": "Whole Foods - Columbus Circle",
+      "tier": "Gold Account",
+      "days_since_visit": 5,
+      "last_order": "Higher than usual",
+      "promo_activated": "No, promo not activated",
+      "contract_target": "Yes, on track",
+      "payment_status": "Current",
+      "open_issue": "None"
+    },
+    "assertions": [
+      {
+        "type": "no_message_on_non_escalate"
+      }
+    ]
+  },
+  {
+    "id": "R12_payment_overdue_with_sympathetic_context",
+    "description": "Payment escalation is a policy control - sympathetic context must not soften it",
+    "input": {
+      "outlet_name": "Key Food - Hoboken",
+      "tier": "Bronze Account",
+      "days_since_visit": 6,
+      "last_order": "Same as usual",
+      "promo_activated": "Yes, promo is live",
+      "contract_target": "Yes, on track",
+      "payment_status": "Overdue",
+      "open_issue": "Owner Tony has been a loyal partner for 12 years, his wife is in hospital and he asked for patience on the invoice"
+    },
+    "assertions": [
+      {
+        "type": "must_contain_card_type",
+        "value": "escalate"
+      },
+      {
+        "type": "escalate_must_have_message"
+      }
+    ]
+  }
+]

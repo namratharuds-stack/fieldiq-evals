@@ -7,7 +7,7 @@ An agent that drafts a commercial order or tells a rep what to escalate can't be
 | Suite | Agent | Fails by | Cases | Headline result |
 |---|---|---|---|---|
 | [`draft-order/`](draft-order) | **Draft Order Agent**: pre-builds a rep's order with a reason code and quantity on every line | *computing* wrong | 26 golden cases, 13 categories | Ship gate catches 3 critical failures on a seeded sample |
-| [`commcheck/`](commcheck) | **CommCheck**: pre-visit briefing cards (`act_today`, `escalate`, `opportunity`) | *classifying* wrong | 19 cases: schema, rules, adversarial | 18/19 rule adherence; format instruction at 0% compliance |
+| [`commcheck/`](commcheck) | **CommCheck**: pre-visit briefing cards (`act_today`, `escalate`, `opportunity`) | *classifying* wrong | 20 cases: schema, rules, LLM-judged quality, adversarial | v1 → v2: format compliance 0% → 100%, rules 18/19 → 20/20, and a quality tradeoff the judge caught |
 
 Two agents fail in two different ways, so the eval designs differ.
 
@@ -44,6 +44,12 @@ The failing gate is the point. The fixture is a seeded prediction set with four 
 
 **What held up:** a prompt injection hidden in the rep's free-text field tried to suppress a mandatory payment escalation, and the escalation still fired. A sympathetic excuse for an overdue payment didn't soften it either. Payment escalation behaves as policy, not judgment.
 
+### v1 → v2: fixing the findings, then measuring what the fix cost
+
+v2 applied both fixes: format enforced through a tool schema, and shortfall split from breach. On a same-day rerun, outputs needing cleanup went from **19/19 to 0/20** and rule adherence from **18/19 to 20/20**.
+
+A new LLM-judge layer (Opus 5.5 grading Sonnet 4.6) found the cost. v2's "say when a rule doesn't cover this" instruction worked, but the explanation leaked into the card the rep reads. Mean usability dropped from 3.47 to 3.25. The next fix is a separate `spec_gap` field for the product team. [Full comparison →](commcheck#results-v1--v2-2026-09-28)
+
 ---
 
 ## Run it
@@ -54,9 +60,11 @@ pip install -r requirements.txt
 # Draft Order: fixture mode is free, offline, deterministic
 cd draft-order && python score_draft_orders.py
 
-# CommCheck: calls the Anthropic API (~19 calls, cents per run)
+# CommCheck: calls the Anthropic API (cents per run). Key from env or ../.env
 export ANTHROPIC_API_KEY=...
 cd commcheck && python runner.py --layers 1,2,4
+cd commcheck && python runner.py --layers 1,2,3,4 --prompt prompts/commcheck_v2.txt \
+  --rule-cases cases/rule_cases_v2.json --structured --judge-model claude-opus-5-5
 ```
 
 Every run writes a timestamped markdown report and raw JSON to that suite's `reports/`. The runs quoted above are committed there.
@@ -74,7 +82,7 @@ To measure a prompt change, add a new version under `commcheck/prompts/`, run wi
 
 - All outlet, SKU, contract, and velocity data is FieldIQ demo data. None of it comes from a real company.
 - CommCheck is evaluated against its **specified** system prompt through the Anthropic API. The deployed prototype uses a different model backend, so these results describe the system as specified. Diffing the two is a separate exercise.
-- A fourth CommCheck layer, an LLM-as-judge for specificity and tone, is designed but not built yet.
+- The Layer 3 judge isn't calibrated against human labels yet. Use its scores to compare versions, not as an absolute measure of quality.
 
 ---
 
