@@ -1,0 +1,863 @@
+{
+  "summary": {
+    "total": 26,
+    "passed": 22,
+    "pass_rate": 0.8461538461538461,
+    "critical_failures": 3,
+    "gate": "FAIL"
+  },
+  "results": [
+    {
+      "case_id": "GC01",
+      "category": "velocity_reorder",
+      "description": "Steady velocity, healthy on-hand, straightforward reorder",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "spurious_escalation",
+          "critical": false,
+          "passed": true,
+          "detail": "no escalation"
+        },
+        {
+          "check": "line_present[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 6 vs band 6-12"
+        }
+      ]
+    },
+    {
+      "case_id": "GC02",
+      "category": "velocity_reorder",
+      "description": "High velocity, low on-hand \u2014 larger reorder justified",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 30 vs band 24-36"
+        }
+      ]
+    },
+    {
+      "case_id": "GC03",
+      "category": "void_fill",
+      "description": "Authorized SKU with zero distribution \u2014 classic void",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PB-VAN-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-VAN-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected contract_gap, got contract_gap"
+        },
+        {
+          "check": "qty_band[PB-VAN-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 12 vs band 12-24"
+        }
+      ]
+    },
+    {
+      "case_id": "GC04",
+      "category": "void_fill",
+      "description": "Multiple voids \u2014 both should be filled",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PC-SC-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PC-SC-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected contract_gap, got contract_gap"
+        },
+        {
+          "check": "qty_band[PC-SC-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 6 vs band 6-12"
+        },
+        {
+          "check": "line_present[PC-RANCH-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PC-RANCH-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected contract_gap, got contract_gap"
+        },
+        {
+          "check": "qty_band[PC-RANCH-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 6 vs band 6-12"
+        }
+      ]
+    },
+    {
+      "case_id": "GC05",
+      "category": "oos_recovery",
+      "description": "Stocked out mid-period \u2014 recovery order above normal velocity",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 30 vs band 24-42"
+        }
+      ]
+    },
+    {
+      "case_id": "GC06",
+      "category": "oos_recovery",
+      "description": "Recent OOS on slow mover \u2014 modest recovery, not overcorrection",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PC-BBQ-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PC-BBQ-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PC-BBQ-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 6 vs band 4-10"
+        }
+      ]
+    },
+    {
+      "case_id": "GC07",
+      "category": "post_promo_damping",
+      "description": "Promo ended last week \u2014 inflated velocity must be damped",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 12 vs band 6-18"
+        }
+      ]
+    },
+    {
+      "case_id": "GC08",
+      "category": "post_promo_damping",
+      "description": "Promo still live \u2014 velocity is real, no damping",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PB-PB-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-PB-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected promo_requirement, got promo_requirement"
+        },
+        {
+          "check": "qty_band[PB-PB-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 30 vs band 24-36"
+        }
+      ]
+    },
+    {
+      "case_id": "GC09",
+      "category": "new_outlet",
+      "description": "New account, no history \u2014 benchmark-keyed opening order",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected whitespace_opportunity, got whitespace_opportunity"
+        },
+        {
+          "check": "qty_band[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 12 vs band 6-18"
+        }
+      ]
+    },
+    {
+      "case_id": "GC10",
+      "category": "new_outlet",
+      "description": "New outlet, low-tier \u2014 conservative opening",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PP-CHOC-2LB]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PP-CHOC-2LB]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected whitespace_opportunity, got whitespace_opportunity"
+        },
+        {
+          "check": "qty_band[PP-CHOC-2LB]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 2 vs band 2-6"
+        }
+      ]
+    },
+    {
+      "case_id": "GC11",
+      "category": "overstock_trim",
+      "description": "On-hand far exceeds coverage \u2014 should not reorder",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "no_order_expected",
+          "critical": false,
+          "passed": true,
+          "detail": "correctly held"
+        }
+      ]
+    },
+    {
+      "case_id": "GC12",
+      "category": "post_promo_damping",
+      "description": "SEEDED FAILURE \u2014 post-promo spike chased instead of damped",
+      "passed": false,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PP-CHOC-2LB]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PP-CHOC-2LB]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PP-CHOC-2LB]",
+          "critical": false,
+          "passed": false,
+          "detail": "qty 32 vs band 4-12"
+        }
+      ]
+    },
+    {
+      "case_id": "GC13",
+      "category": "pack_rounding",
+      "description": "Computed need must round to pack multiple",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PB-VAN-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-VAN-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PB-VAN-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 8 vs band 4-12"
+        },
+        {
+          "check": "pack_rounding[PB-VAN-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 8 vs pack multiple 4"
+        }
+      ]
+    },
+    {
+      "case_id": "GC14",
+      "category": "pack_rounding",
+      "description": "Large pack size \u2014 rounding matters more",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PB-SINGLE-CHOC]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-SINGLE-CHOC]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PB-SINGLE-CHOC]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 36 vs band 24-48"
+        },
+        {
+          "check": "pack_rounding[PB-SINGLE-CHOC]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 36 vs pack multiple 12"
+        }
+      ]
+    },
+    {
+      "case_id": "GC15",
+      "category": "missing_data",
+      "description": "No velocity, no benchmark \u2014 must hold, not guess",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "missing_escalation",
+          "critical": true,
+          "passed": true,
+          "detail": "escalated correctly"
+        }
+      ]
+    },
+    {
+      "case_id": "GC16",
+      "category": "missing_data",
+      "description": "On-hand unknown but velocity known \u2014 partial data, still escalate",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "missing_escalation",
+          "critical": true,
+          "passed": true,
+          "detail": "escalated correctly"
+        }
+      ]
+    },
+    {
+      "case_id": "GC17",
+      "category": "conflicting_signals",
+      "description": "Velocity high but on-hand also high \u2014 contradiction",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "missing_escalation",
+          "critical": true,
+          "passed": true,
+          "detail": "escalated correctly"
+        }
+      ]
+    },
+    {
+      "case_id": "GC18",
+      "category": "conflicting_signals",
+      "description": "Void flag but positive velocity \u2014 data integrity problem",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "missing_escalation",
+          "critical": true,
+          "passed": true,
+          "detail": "escalated correctly"
+        }
+      ]
+    },
+    {
+      "case_id": "GC19",
+      "category": "conflicting_signals",
+      "description": "SEEDED FAILURE \u2014 conflicting signals reconciled instead of escalated",
+      "passed": false,
+      "critical_failure": true,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "missing_escalation",
+          "critical": true,
+          "passed": false,
+          "detail": "expected escalation; got escalated=False, 1 line(s)"
+        }
+      ]
+    },
+    {
+      "case_id": "GC20",
+      "category": "assortment_guard",
+      "description": "Unauthorized SKU must never appear in output",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 12 vs band 6-18"
+        }
+      ]
+    },
+    {
+      "case_id": "GC21",
+      "category": "assortment_guard",
+      "description": "SEEDED FAILURE \u2014 unauthorized SKU recommended",
+      "passed": false,
+      "critical_failure": true,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": false,
+          "detail": "recommended outside assortment: ['PP-CHOC-2LB']"
+        },
+        {
+          "check": "line_present[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 12 vs band 12-24"
+        }
+      ]
+    },
+    {
+      "case_id": "GC22",
+      "category": "moq_compliance",
+      "description": "Order below chain MOQ must be raised to minimum",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "moq_violation",
+          "critical": true,
+          "passed": true,
+          "detail": "order total 12 cases vs chain MOQ 12"
+        },
+        {
+          "check": "line_present[PC-BBQ-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PC-BBQ-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PC-BBQ-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 12 vs band 6-18"
+        }
+      ]
+    },
+    {
+      "case_id": "GC23",
+      "category": "moq_compliance",
+      "description": "Multi-line order comfortably above MOQ",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "moq_violation",
+          "critical": true,
+          "passed": true,
+          "detail": "order total 36 cases vs chain MOQ 6"
+        },
+        {
+          "check": "line_present[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PB-CHOC-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 18 vs band 12-24"
+        },
+        {
+          "check": "line_present[PB-PB-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PB-PB-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PB-PB-12]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 18 vs band 12-24"
+        }
+      ]
+    },
+    {
+      "case_id": "GC24",
+      "category": "moq_compliance",
+      "description": "SEEDED FAILURE \u2014 chain MOQ ignored, order un-submittable",
+      "passed": false,
+      "critical_failure": true,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "moq_violation",
+          "critical": true,
+          "passed": false,
+          "detail": "order total 6 cases vs chain MOQ 24"
+        },
+        {
+          "check": "line_present[PC-SC-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PC-SC-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PC-SC-8]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 6 vs band 6-30"
+        }
+      ]
+    },
+    {
+      "case_id": "GC25",
+      "category": "cap_enforcement",
+      "description": "Quantity must not exceed cap of 4x trailing velocity",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "line_present[PP-VAN-2LB]",
+          "critical": false,
+          "passed": true,
+          "detail": "present"
+        },
+        {
+          "check": "reason_code[PP-VAN-2LB]",
+          "critical": false,
+          "passed": true,
+          "detail": "expected velocity_reorder, got velocity_reorder"
+        },
+        {
+          "check": "qty_band[PP-VAN-2LB]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 18 vs band 6-24"
+        },
+        {
+          "check": "velocity_cap[PP-VAN-2LB]",
+          "critical": false,
+          "passed": true,
+          "detail": "qty 18 vs cap 24 (4x velocity 6)"
+        }
+      ]
+    },
+    {
+      "case_id": "GC26",
+      "category": "confidence_escalation",
+      "description": "Benchmark exists but is from a dissimilar format \u2014 low confidence",
+      "passed": true,
+      "critical_failure": false,
+      "checks": [
+        {
+          "check": "unauthorized_sku",
+          "critical": true,
+          "passed": true,
+          "detail": "clean"
+        },
+        {
+          "check": "missing_escalation",
+          "critical": true,
+          "passed": true,
+          "detail": "escalated correctly"
+        }
+      ]
+    }
+  ]
+}

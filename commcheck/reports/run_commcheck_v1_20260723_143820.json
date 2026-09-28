@@ -1,0 +1,68 @@
+[
+  {
+    "case_id": "R01_payment_overdue_gold",
+    "description": "Payment overdue must always produce an escalate card",
+    "schema_passed": true,
+    "schema_findings": [
+      "SPEC VIOLATION: output required cleaning (markdown fence or preamble) despite 'Return ONLY valid JSON' instruction"
+    ],
+    "rules_passed": true,
+    "rule_results": [
+      {
+        "assertion": "must contain 'escalate' card",
+        "passed": true,
+        "observed": "card types present: ['escalate']",
+        "scored": true
+      },
+      {
+        "assertion": "every escalate card has escalation_message",
+        "passed": true,
+        "observed": "1 escalate card(s), 0 missing message",
+        "scored": true
+      }
+    ],
+    "raw_output": "```json\n{\n  \"outlet_name\": \"Metro Cash & Carry - Sector 14\",\n  \"tier\": \"Gold\",\n  \"cards\": [\n    {\n      \"type\": \"escalate\",\n      \"risk_summary\": \"Payment is overdue on a Gold account. Allowing this to age further puts new order intake and contract continuity at risk, and it cannot be resolved at rep level alone.\",\n      \"action\": \"Do not take a new order until payment status is clarified. Open the visit by acknowledging the relationship, then say: 'Before we talk about the next order, I need to flag that our accounts team is showing an overdue balance on your account. I want to make sure we get that cleared so there are no holds on your side. Can you connect me with your finance contact today?' Send the escalation message to your manager before you walk in.\",\n      \"escalation_message\": \"Hey, heading into Metro Cash & Carry Sector 14 now. Wanted to flag that payment is showing overdue on their account. They're Gold tier and everything else is on track \u2014 promo live, contract on target \u2014 so I don't want this to stall the relationship or block the next order. Can you check with AR on the exact overdue amount and whether there's a hold in place? I'll hold off on writing a new order until I hear back from you.\"\n    }\n  ]\n}\n```"
+  },
+  {
+    "case_id": "R02_payment_overdue_general_trade",
+    "description": "Payment overdue escalates regardless of tier",
+    "schema_passed": true,
+    "schema_findings": [
+      "SPEC VIOLATION: output required cleaning (markdown fence or preamble) despite 'Return ONLY valid JSON' instruction"
+    ],
+    "rules_passed": true,
+    "rule_results": [
+      {
+        "assertion": "must contain 'escalate' card",
+        "passed": true,
+        "observed": "card types present: ['escalate']",
+        "scored": true
+      },
+      {
+        "assertion": "every escalate card has escalation_message",
+        "passed": true,
+        "observed": "1 escalate card(s), 0 missing message",
+        "scored": true
+      }
+    ],
+    "raw_output": "```json\n{\n  \"outlet_name\": \"Sharma General Store\",\n  \"tier\": \"General Trade\",\n  \"cards\": [\n    {\n      \"type\": \"escalate\",\n      \"risk_summary\": \"Payment is overdue at Sharma General Store. Despite strong recent order volume and an active promo, outstanding payment poses a credit risk and may block future order processing.\",\n      \"action\": \"Before discussing any new orders or promo performance, raise the overdue payment directly with the owner. Say: 'Mr. Sharma, I can see your last order was strong and the promo is running well \u2014 great work on that. Before we look at what's next, I need to get the overdue balance cleared or at least get a firm commitment date from you today. Can we sort that out first?' Do not take any new orders until payment status is confirmed or escalated.\",\n      \"escalation_message\": \"Hi [Manager name], heading into Sharma General Store now. Payment is overdue and I want to flag it before the visit. They've been ordering well and the promo is live, so the relationship is active \u2014 but I don't want to take another order on an unpaid balance without your sign-off. Can you confirm whether I should hold new orders until this is cleared, or if there's a credit extension in place? Will update you after the visit.\"\n    }\n  ]\n}\n```"
+  },
+  {
+    "case_id": "R03_contract_behind_escalates",
+    "description": "Contract breach must always escalate, never just note it",
+    "schema_passed": true,
+    "schema_findings": [
+      "SPEC VIOLATION: output required cleaning (markdown fence or preamble) despite 'Return ONLY valid JSON' instruction"
+    ],
+    "rules_passed": false,
+    "rule_results": [
+      {
+        "assertion": "must contain 'escalate' card",
+        "passed": false,
+        "observed": "card types present: ['act_today']",
+        "scored": true
+      }
+    ],
+    "raw_output": "```json\n{\n  \"outlet_name\": \"Star Bazaar - Main Branch\",\n  \"tier\": \"Silver\",\n  \"cards\": [\n    {\n      \"type\": \"act_today\",\n      \"risk_summary\": \"Star Bazaar is running behind on their contract volume target. If this gap isn't closed before the contract review period, they risk losing Silver tier benefits and you risk missing your committed volume.\",\n      \"action\": \"Pull up the Q3 volume bridge before you walk in. Open the conversation with something like: 'Your promo is performing well \u2014 let's look at where you are against your volume commitment and see if we can close the gap with a top-up order today. What's moving fastest on shelf right now?' Come prepared with a specific SKU recommendation or bundle that can close the shortfall in one order.\"\n    }\n  ]\n}\n```"
+  }
+]

@@ -1,0 +1,519 @@
+{
+  "_schema_note": "Each case carries outlet context, the SKU universe (authorized vs unauthorized), and per-line expectations. Quantity is scored against an explicit min/max band set by hand adjudication, not a fixed percentage — a void-fill trial order and a velocity reorder tolerate different error. Reason code and safety behaviour are exact-match.",
+  "categories": [
+    "velocity_reorder", "void_fill", "oos_recovery", "post_promo_damping",
+    "new_outlet", "overstock_trim", "missing_data", "conflicting_signals",
+    "moq_compliance", "pack_rounding", "assortment_guard", "confidence_escalation",
+    "cap_enforcement"
+  ],
+  "cases": [
+    {
+      "id": "GC01",
+      "category": "velocity_reorder",
+      "description": "Steady velocity, healthy on-hand, straightforward reorder",
+      "outlet": {
+        "name": "Target - Jersey City Newport", "tier": "Gold",
+        "chain_moq_cases": 6, "salesMTD": 7200, "salesTarget": 7500
+      },
+      "authorized_skus": ["PB-CHOC-12", "PB-PB-12", "PC-BBQ-8"],
+      "unauthorized_skus": ["PP-PLANT-2LB"],
+      "signals": [
+        {"sku": "PB-CHOC-12", "weekly_velocity": 6, "on_hand": 4, "pack": 6, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PB-CHOC-12", "reason_type": "velocity_reorder", "qty_min": 6, "qty_max": 12}
+        ],
+        "must_not_escalate": true
+      }
+    },
+    {
+      "id": "GC02",
+      "category": "velocity_reorder",
+      "description": "High velocity, low on-hand — larger reorder justified",
+      "outlet": {
+        "name": "Whole Foods - Columbus Circle", "tier": "Gold",
+        "chain_moq_cases": 6, "salesMTD": 11200, "salesTarget": 11000
+      },
+      "authorized_skus": ["PB-CHOC-12", "PP-CHOC-2LB"],
+      "unauthorized_skus": ["PC-RANCH-8"],
+      "signals": [
+        {"sku": "PB-CHOC-12", "weekly_velocity": 18, "on_hand": 6, "pack": 6, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PB-CHOC-12", "reason_type": "velocity_reorder", "qty_min": 24, "qty_max": 36}
+        ]
+      }
+    },
+    {
+      "id": "GC03",
+      "category": "void_fill",
+      "description": "Authorized SKU with zero distribution — classic void",
+      "outlet": {
+        "name": "Walmart Supercenter - Route 9", "tier": "Gold",
+        "chain_moq_cases": 12, "salesMTD": 8400, "salesTarget": 12000
+      },
+      "authorized_skus": ["PB-CHOC-12", "PB-VAN-12", "PC-BBQ-8"],
+      "unauthorized_skus": ["PP-VAN-2LB"],
+      "signals": [
+        {"sku": "PB-VAN-12", "weekly_velocity": 0, "on_hand": 0, "pack": 12, "authorized_not_stocked": true, "benchmark_velocity": 8}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PB-VAN-12", "reason_type": "contract_gap", "qty_min": 12, "qty_max": 24}
+        ]
+      }
+    },
+    {
+      "id": "GC04",
+      "category": "void_fill",
+      "description": "Multiple voids — both should be filled",
+      "outlet": {
+        "name": "ShopRite - Bayonne", "tier": "Silver",
+        "chain_moq_cases": 6, "salesMTD": 3400, "salesTarget": 4800
+      },
+      "authorized_skus": ["PB-CHOC-12", "PC-SC-8", "PC-RANCH-8"],
+      "unauthorized_skus": ["COMBO-GYM"],
+      "signals": [
+        {"sku": "PC-SC-8", "weekly_velocity": 0, "on_hand": 0, "pack": 6, "authorized_not_stocked": true, "benchmark_velocity": 6},
+        {"sku": "PC-RANCH-8", "weekly_velocity": 0, "on_hand": 0, "pack": 6, "authorized_not_stocked": true, "benchmark_velocity": 4}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PC-SC-8", "reason_type": "contract_gap", "qty_min": 6, "qty_max": 12},
+          {"sku": "PC-RANCH-8", "reason_type": "contract_gap", "qty_min": 6, "qty_max": 12}
+        ]
+      }
+    },
+    {
+      "id": "GC05",
+      "category": "oos_recovery",
+      "description": "Stocked out mid-period — recovery order above normal velocity",
+      "outlet": {
+        "name": "Target - Herald Square", "tier": "Gold",
+        "chain_moq_cases": 6, "salesMTD": 9100, "salesTarget": 9000
+      },
+      "authorized_skus": ["PB-CHOC-12", "PB-PB-12"],
+      "unauthorized_skus": ["PC-SINGLE"],
+      "signals": [
+        {"sku": "PB-CHOC-12", "weekly_velocity": 12, "on_hand": 0, "pack": 6, "days_oos": 9, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PB-CHOC-12", "reason_type": "velocity_reorder", "qty_min": 24, "qty_max": 42}
+        ]
+      }
+    },
+    {
+      "id": "GC06",
+      "category": "oos_recovery",
+      "description": "Recent OOS on slow mover — modest recovery, not overcorrection",
+      "outlet": {
+        "name": "Key Food - Hoboken", "tier": "Bronze",
+        "chain_moq_cases": 2, "salesMTD": 1200, "salesTarget": 1300
+      },
+      "authorized_skus": ["PB-CHOC-12", "PC-BBQ-8"],
+      "unauthorized_skus": ["PP-CHOC-2LB"],
+      "signals": [
+        {"sku": "PC-BBQ-8", "weekly_velocity": 3, "on_hand": 0, "pack": 2, "days_oos": 4, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PC-BBQ-8", "reason_type": "velocity_reorder", "qty_min": 4, "qty_max": 10}
+        ]
+      }
+    },
+    {
+      "id": "GC07",
+      "category": "post_promo_damping",
+      "description": "Promo ended last week — inflated velocity must be damped",
+      "outlet": {
+        "name": "Target - Hoboken", "tier": "Silver",
+        "chain_moq_cases": 6, "salesMTD": 3800, "salesTarget": 5500
+      },
+      "authorized_skus": ["PB-CHOC-12", "PB-PB-12"],
+      "unauthorized_skus": ["PP-PLANT-2LB"],
+      "signals": [
+        {"sku": "PB-CHOC-12", "weekly_velocity": 24, "baseline_velocity": 8, "on_hand": 6, "pack": 6, "promo_ended_days_ago": 5, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PB-CHOC-12", "reason_type": "velocity_reorder", "qty_min": 6, "qty_max": 18}
+        ],
+        "note": "Band deliberately excludes an order sized off the promo-inflated 24/wk figure"
+      }
+    },
+    {
+      "id": "GC08",
+      "category": "post_promo_damping",
+      "description": "Promo still live — velocity is real, no damping",
+      "outlet": {
+        "name": "Walmart Neighborhood Market - Secaucus", "tier": "Silver",
+        "chain_moq_cases": 6, "salesMTD": 3200, "salesTarget": 3500
+      },
+      "authorized_skus": ["PB-CHOC-12", "PB-PB-12"],
+      "unauthorized_skus": ["COMBO-GYM"],
+      "signals": [
+        {"sku": "PB-PB-12", "weekly_velocity": 18, "baseline_velocity": 8, "on_hand": 4, "pack": 6, "promo_active": true, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PB-PB-12", "reason_type": "promo_requirement", "qty_min": 24, "qty_max": 36}
+        ]
+      }
+    },
+    {
+      "id": "GC09",
+      "category": "new_outlet",
+      "description": "New account, no history — benchmark-keyed opening order",
+      "outlet": {
+        "name": "Trader Joe's - Hoboken", "tier": "Gold",
+        "chain_moq_cases": 6, "salesMTD": 0, "salesTarget": 6000
+      },
+      "authorized_skus": ["PB-CHOC-12", "PB-PB-12", "PB-VAN-12"],
+      "unauthorized_skus": ["PC-SINGLE"],
+      "signals": [
+        {"sku": "PB-CHOC-12", "weekly_velocity": null, "on_hand": 0, "pack": 6, "new_outlet": true, "benchmark_velocity": 10}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PB-CHOC-12", "reason_type": "whitespace_opportunity", "qty_min": 6, "qty_max": 18}
+        ],
+        "note": "Opening orders are trial-sized — half benchmark velocity per the shipped prompt"
+      }
+    },
+    {
+      "id": "GC10",
+      "category": "new_outlet",
+      "description": "New outlet, low-tier — conservative opening",
+      "outlet": {
+        "name": "Blink Fitness - Journal Square", "tier": "Bronze",
+        "chain_moq_cases": 2, "salesMTD": 0, "salesTarget": 1600
+      },
+      "authorized_skus": ["PB-CHOC-12", "PP-CHOC-2LB"],
+      "unauthorized_skus": ["PC-RANCH-8"],
+      "signals": [
+        {"sku": "PP-CHOC-2LB", "weekly_velocity": null, "on_hand": 0, "pack": 2, "new_outlet": true, "benchmark_velocity": 3}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PP-CHOC-2LB", "reason_type": "whitespace_opportunity", "qty_min": 2, "qty_max": 6}
+        ]
+      }
+    },
+    {
+      "id": "GC11",
+      "category": "overstock_trim",
+      "description": "On-hand far exceeds coverage — should not reorder",
+      "outlet": {
+        "name": "CVS Pharmacy - Hoboken", "tier": "Bronze",
+        "chain_moq_cases": 2, "salesMTD": 1800, "salesTarget": 2000
+      },
+      "authorized_skus": ["PB-CHOC-12", "PC-BBQ-8"],
+      "unauthorized_skus": ["PP-VAN-2LB"],
+      "signals": [
+        {"sku": "PB-CHOC-12", "weekly_velocity": 2, "on_hand": 24, "pack": 2, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [],
+        "must_not_include_skus": ["PB-CHOC-12"],
+        "note": "12 weeks of cover on hand — any reorder line is wrong"
+      }
+    },
+    {
+      "id": "GC12",
+      "category": "post_promo_damping",
+      "description": "SEEDED FAILURE — post-promo spike chased instead of damped",
+      "outlet": {
+        "name": "GNC - Jersey City Exchange Place", "tier": "Silver",
+        "chain_moq_cases": 4, "salesMTD": 4200, "salesTarget": 4000
+      },
+      "authorized_skus": ["PB-CHOC-12", "PP-CHOC-2LB"],
+      "unauthorized_skus": ["PC-BBQ-8"],
+      "signals": [
+        {"sku": "PP-CHOC-2LB", "weekly_velocity": 16, "baseline_velocity": 4, "on_hand": 2, "pack": 4, "promo_ended_days_ago": 3, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PP-CHOC-2LB", "reason_type": "velocity_reorder", "qty_min": 4, "qty_max": 12}
+        ]
+      }
+    },
+    {
+      "id": "GC13",
+      "category": "pack_rounding",
+      "description": "Computed need must round to pack multiple",
+      "outlet": {
+        "name": "Vitamin Shoppe - Journal Square", "tier": "Silver",
+        "chain_moq_cases": 4, "salesMTD": 3600, "salesTarget": 3500
+      },
+      "authorized_skus": ["PB-VAN-12", "PP-PLANT-2LB"],
+      "unauthorized_skus": ["PC-SC-8"],
+      "signals": [
+        {"sku": "PB-VAN-12", "weekly_velocity": 5, "on_hand": 3, "pack": 4, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PB-VAN-12", "reason_type": "velocity_reorder", "qty_min": 4, "qty_max": 12, "pack_multiple": 4}
+        ]
+      }
+    },
+    {
+      "id": "GC14",
+      "category": "pack_rounding",
+      "description": "Large pack size — rounding matters more",
+      "outlet": {
+        "name": "7-Eleven - Grove St", "tier": "General Trade",
+        "chain_moq_cases": 12, "salesMTD": 1800, "salesTarget": 2000
+      },
+      "authorized_skus": ["PB-SINGLE-CHOC", "PC-SINGLE"],
+      "unauthorized_skus": ["PP-CHOC-2LB"],
+      "signals": [
+        {"sku": "PB-SINGLE-CHOC", "weekly_velocity": 20, "on_hand": 8, "pack": 12, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PB-SINGLE-CHOC", "reason_type": "velocity_reorder", "qty_min": 24, "qty_max": 48, "pack_multiple": 12}
+        ]
+      }
+    },
+    {
+      "id": "GC15",
+      "category": "missing_data",
+      "description": "No velocity, no benchmark — must hold, not guess",
+      "outlet": {
+        "name": "SoulCycle - West Village", "tier": "Bronze",
+        "chain_moq_cases": 2, "salesMTD": 1400, "salesTarget": 1600
+      },
+      "authorized_skus": ["PB-CHOC-12", "PB-VAN-12"],
+      "unauthorized_skus": ["PP-PLANT-2LB"],
+      "signals": [
+        {"sku": "PB-VAN-12", "weekly_velocity": null, "on_hand": null, "pack": 2, "benchmark_velocity": null}
+      ],
+      "expect": {
+        "must_escalate": true,
+        "lines": [],
+        "note": "Thin data must fail loud — hold or escalate, never a silent guess"
+      }
+    },
+    {
+      "id": "GC16",
+      "category": "missing_data",
+      "description": "On-hand unknown but velocity known — partial data, still escalate",
+      "outlet": {
+        "name": "GNC - Hoboken Washington St", "tier": "Silver",
+        "chain_moq_cases": 4, "salesMTD": 2100, "salesTarget": 3800
+      },
+      "authorized_skus": ["PB-CHOC-12", "PP-CHOC-2LB"],
+      "unauthorized_skus": ["PC-RANCH-8"],
+      "signals": [
+        {"sku": "PB-CHOC-12", "weekly_velocity": 6, "on_hand": null, "pack": 4, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "must_escalate": true,
+        "note": "Gap = need minus on-hand. Without on-hand the quantity is unknowable."
+      }
+    },
+    {
+      "id": "GC17",
+      "category": "conflicting_signals",
+      "description": "Velocity high but on-hand also high — contradiction",
+      "outlet": {
+        "name": "Equinox Fitness - Hoboken", "tier": "Silver",
+        "chain_moq_cases": 4, "salesMTD": 2800, "salesTarget": 2600
+      },
+      "authorized_skus": ["PB-CHOC-12", "PP-VAN-2LB"],
+      "unauthorized_skus": ["PC-SC-8"],
+      "signals": [
+        {"sku": "PP-VAN-2LB", "weekly_velocity": 20, "on_hand": 60, "pack": 4, "coverage_weeks": 2, "signal_conflict": true}
+      ],
+      "expect": {
+        "must_escalate": true,
+        "note": "20/wk velocity with 60 on hand is internally inconsistent — reconciling silently is the failure"
+      }
+    },
+    {
+      "id": "GC18",
+      "category": "conflicting_signals",
+      "description": "Void flag but positive velocity — data integrity problem",
+      "outlet": {
+        "name": "Walgreens - Journal Square", "tier": "Bronze",
+        "chain_moq_cases": 2, "salesMTD": 1600, "salesTarget": 1800
+      },
+      "authorized_skus": ["PB-CHOC-12", "PC-BBQ-8"],
+      "unauthorized_skus": ["COMBO-STARTER"],
+      "signals": [
+        {"sku": "PC-BBQ-8", "weekly_velocity": 8, "on_hand": 0, "pack": 2, "authorized_not_stocked": true, "signal_conflict": true}
+      ],
+      "expect": {
+        "must_escalate": true,
+        "note": "A SKU cannot be both never-stocked and selling 8/wk"
+      }
+    },
+    {
+      "id": "GC19",
+      "category": "conflicting_signals",
+      "description": "SEEDED FAILURE — conflicting signals reconciled instead of escalated",
+      "outlet": {
+        "name": "Whole Foods - Jersey City", "tier": "Gold",
+        "chain_moq_cases": 6, "salesMTD": 5800, "salesTarget": 7000
+      },
+      "authorized_skus": ["PB-CHOC-12", "PP-PLANT-2LB"],
+      "unauthorized_skus": ["PC-SINGLE"],
+      "signals": [
+        {"sku": "PP-PLANT-2LB", "weekly_velocity": 12, "on_hand": 40, "pack": 6, "coverage_weeks": 2, "signal_conflict": true}
+      ],
+      "expect": {
+        "must_escalate": true,
+        "critical": true
+      }
+    },
+    {
+      "id": "GC20",
+      "category": "assortment_guard",
+      "description": "Unauthorized SKU must never appear in output",
+      "outlet": {
+        "name": "Target - Jersey City Newport", "tier": "Gold",
+        "chain_moq_cases": 6, "salesMTD": 7200, "salesTarget": 7500
+      },
+      "authorized_skus": ["PB-CHOC-12", "PB-PB-12"],
+      "unauthorized_skus": ["PP-PLANT-2LB", "COMBO-GYM"],
+      "signals": [
+        {"sku": "PB-CHOC-12", "weekly_velocity": 8, "on_hand": 4, "pack": 6, "coverage_weeks": 2},
+        {"sku": "PP-PLANT-2LB", "weekly_velocity": 6, "on_hand": 0, "pack": 6, "unauthorized": true}
+      ],
+      "expect": {
+        "must_not_include_skus": ["PP-PLANT-2LB", "COMBO-GYM"],
+        "lines": [
+          {"sku": "PB-CHOC-12", "reason_type": "velocity_reorder", "qty_min": 6, "qty_max": 18}
+        ]
+      }
+    },
+    {
+      "id": "GC21",
+      "category": "assortment_guard",
+      "description": "SEEDED FAILURE — unauthorized SKU recommended",
+      "outlet": {
+        "name": "Walmart Supercenter - North Bergen", "tier": "Gold",
+        "chain_moq_cases": 12, "salesMTD": 6800, "salesTarget": 9000
+      },
+      "authorized_skus": ["PB-CHOC-12", "PB-PB-12", "PB-VAN-12"],
+      "unauthorized_skus": ["PP-CHOC-2LB", "COMBO-GYM"],
+      "signals": [
+        {"sku": "PB-CHOC-12", "weekly_velocity": 10, "on_hand": 6, "pack": 12, "coverage_weeks": 2},
+        {"sku": "PP-CHOC-2LB", "weekly_velocity": 4, "on_hand": 0, "pack": 6, "unauthorized": true}
+      ],
+      "expect": {
+        "must_not_include_skus": ["PP-CHOC-2LB", "COMBO-GYM"],
+        "lines": [
+          {"sku": "PB-CHOC-12", "reason_type": "velocity_reorder", "qty_min": 12, "qty_max": 24}
+        ],
+        "critical": true
+      }
+    },
+    {
+      "id": "GC22",
+      "category": "moq_compliance",
+      "description": "Order below chain MOQ must be raised to minimum",
+      "outlet": {
+        "name": "Walmart Supercenter - Route 9", "tier": "Gold",
+        "chain_moq_cases": 12, "salesMTD": 8400, "salesTarget": 12000
+      },
+      "authorized_skus": ["PB-CHOC-12", "PC-BBQ-8"],
+      "unauthorized_skus": ["PP-VAN-2LB"],
+      "signals": [
+        {"sku": "PC-BBQ-8", "weekly_velocity": 2, "on_hand": 1, "pack": 6, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PC-BBQ-8", "reason_type": "velocity_reorder", "qty_min": 6, "qty_max": 18}
+        ],
+        "order_moq_cases": 12,
+        "note": "Total order must reach the chain MOQ of 12 cases or the order is un-submittable"
+      }
+    },
+    {
+      "id": "GC23",
+      "category": "moq_compliance",
+      "description": "Multi-line order comfortably above MOQ",
+      "outlet": {
+        "name": "Target - Herald Square", "tier": "Gold",
+        "chain_moq_cases": 6, "salesMTD": 9100, "salesTarget": 9000
+      },
+      "authorized_skus": ["PB-CHOC-12", "PB-PB-12", "PB-VAN-12"],
+      "unauthorized_skus": ["PC-SINGLE"],
+      "signals": [
+        {"sku": "PB-CHOC-12", "weekly_velocity": 12, "on_hand": 6, "pack": 6, "coverage_weeks": 2},
+        {"sku": "PB-PB-12", "weekly_velocity": 10, "on_hand": 4, "pack": 6, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PB-CHOC-12", "reason_type": "velocity_reorder", "qty_min": 12, "qty_max": 24},
+          {"sku": "PB-PB-12", "reason_type": "velocity_reorder", "qty_min": 12, "qty_max": 24}
+        ],
+        "order_moq_cases": 6
+      }
+    },
+    {
+      "id": "GC24",
+      "category": "moq_compliance",
+      "description": "SEEDED FAILURE — chain MOQ ignored, order un-submittable",
+      "outlet": {
+        "name": "ShopRite - Bayonne", "tier": "Silver",
+        "chain_moq_cases": 24, "salesMTD": 3400, "salesTarget": 4800
+      },
+      "authorized_skus": ["PB-CHOC-12", "PC-SC-8"],
+      "unauthorized_skus": ["PP-PLANT-2LB"],
+      "signals": [
+        {"sku": "PC-SC-8", "weekly_velocity": 2, "on_hand": 2, "pack": 6, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PC-SC-8", "reason_type": "velocity_reorder", "qty_min": 6, "qty_max": 30}
+        ],
+        "order_moq_cases": 24,
+        "critical": true
+      }
+    },
+    {
+      "id": "GC25",
+      "category": "cap_enforcement",
+      "description": "Quantity must not exceed cap of 4x trailing velocity",
+      "outlet": {
+        "name": "Whole Foods - Columbus Circle", "tier": "Gold",
+        "chain_moq_cases": 6, "salesMTD": 11200, "salesTarget": 11000
+      },
+      "authorized_skus": ["PB-CHOC-12", "PP-VAN-2LB"],
+      "unauthorized_skus": ["PC-BBQ-8"],
+      "signals": [
+        {"sku": "PP-VAN-2LB", "weekly_velocity": 6, "on_hand": 0, "pack": 6, "coverage_weeks": 2}
+      ],
+      "expect": {
+        "lines": [
+          {"sku": "PP-VAN-2LB", "reason_type": "velocity_reorder", "qty_min": 6, "qty_max": 24}
+        ],
+        "velocity_cap_multiple": 4,
+        "note": "Cap = 4x weekly velocity = 24. Anything above is over-ordering that returns as credit."
+      }
+    },
+    {
+      "id": "GC26",
+      "category": "confidence_escalation",
+      "description": "Benchmark exists but is from a dissimilar format — low confidence",
+      "outlet": {
+        "name": "Key Food - Hoboken", "tier": "Bronze",
+        "chain_moq_cases": 2, "salesMTD": 1200, "salesTarget": 1300
+      },
+      "authorized_skus": ["PB-CHOC-12", "COMBO-STARTER"],
+      "unauthorized_skus": ["PP-CHOC-2LB"],
+      "signals": [
+        {"sku": "COMBO-STARTER", "weekly_velocity": null, "on_hand": 0, "pack": 2, "new_outlet": true, "benchmark_velocity": 14, "benchmark_format_mismatch": true}
+      ],
+      "expect": {
+        "must_escalate": true,
+        "note": "A 14/wk benchmark from a supercenter does not transfer to an independent grocer"
+      }
+    }
+  ]
+}

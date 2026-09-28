@@ -1,0 +1,53 @@
+{
+  "_note": "Seeded sample agent predictions. This is a FIXTURE, not a model run. It exists to prove the graders catch the four documented failure modes (GC12, GC19, GC21, GC24). Twenty-two cases are seeded correct; four are seeded to fail in specific, realistic ways a demand-sensing agent actually fails.",
+  "agent_version": "seeded_sample_v1",
+  "predictions": [
+    {"case_id": "GC01", "escalated": false, "lines": [{"sku": "PB-CHOC-12", "quantity": 6, "reason_type": "velocity_reorder"}]},
+    {"case_id": "GC02", "escalated": false, "lines": [{"sku": "PB-CHOC-12", "quantity": 30, "reason_type": "velocity_reorder"}]},
+    {"case_id": "GC03", "escalated": false, "lines": [{"sku": "PB-VAN-12", "quantity": 12, "reason_type": "contract_gap"}]},
+    {"case_id": "GC04", "escalated": false, "lines": [
+      {"sku": "PC-SC-8", "quantity": 6, "reason_type": "contract_gap"},
+      {"sku": "PC-RANCH-8", "quantity": 6, "reason_type": "contract_gap"}
+    ]},
+    {"case_id": "GC05", "escalated": false, "lines": [{"sku": "PB-CHOC-12", "quantity": 30, "reason_type": "velocity_reorder"}]},
+    {"case_id": "GC06", "escalated": false, "lines": [{"sku": "PC-BBQ-8", "quantity": 6, "reason_type": "velocity_reorder"}]},
+    {"case_id": "GC07", "escalated": false, "lines": [{"sku": "PB-CHOC-12", "quantity": 12, "reason_type": "velocity_reorder"}]},
+    {"case_id": "GC08", "escalated": false, "lines": [{"sku": "PB-PB-12", "quantity": 30, "reason_type": "promo_requirement"}]},
+    {"case_id": "GC09", "escalated": false, "lines": [{"sku": "PB-CHOC-12", "quantity": 12, "reason_type": "whitespace_opportunity"}]},
+    {"case_id": "GC10", "escalated": false, "lines": [{"sku": "PP-CHOC-2LB", "quantity": 2, "reason_type": "whitespace_opportunity"}]},
+    {"case_id": "GC11", "escalated": false, "lines": []},
+
+    {"case_id": "GC12", "escalated": false, "lines": [{"sku": "PP-CHOC-2LB", "quantity": 32, "reason_type": "velocity_reorder"}],
+     "_seeded_failure": "Sized off the promo-inflated 16/wk instead of the 4/wk baseline — chased a spike that had already ended. Non-critical: over-order, not un-shippable."},
+
+    {"case_id": "GC13", "escalated": false, "lines": [{"sku": "PB-VAN-12", "quantity": 8, "reason_type": "velocity_reorder"}]},
+    {"case_id": "GC14", "escalated": false, "lines": [{"sku": "PB-SINGLE-CHOC", "quantity": 36, "reason_type": "velocity_reorder"}]},
+    {"case_id": "GC15", "escalated": true, "lines": []},
+    {"case_id": "GC16", "escalated": true, "lines": []},
+    {"case_id": "GC17", "escalated": true, "lines": []},
+    {"case_id": "GC18", "escalated": true, "lines": []},
+
+    {"case_id": "GC19", "escalated": false, "lines": [{"sku": "PP-PLANT-2LB", "quantity": 6, "reason_type": "velocity_reorder"}],
+     "_seeded_failure": "Silently reconciled a 12/wk velocity against 40 on-hand and produced a small order instead of escalating. CRITICAL: the agent invented a resolution to a data contradiction."},
+
+    {"case_id": "GC20", "escalated": false, "lines": [{"sku": "PB-CHOC-12", "quantity": 12, "reason_type": "velocity_reorder"}]},
+
+    {"case_id": "GC21", "escalated": false, "lines": [
+      {"sku": "PB-CHOC-12", "quantity": 12, "reason_type": "velocity_reorder"},
+      {"sku": "PP-CHOC-2LB", "quantity": 6, "reason_type": "whitespace_opportunity"}
+    ],
+     "_seeded_failure": "Recommended PP-CHOC-2LB, which is not in this outlet's authorized assortment. CRITICAL: unorderable line, and it erodes rep trust in every other line."},
+
+    {"case_id": "GC22", "escalated": false, "lines": [{"sku": "PC-BBQ-8", "quantity": 12, "reason_type": "velocity_reorder"}]},
+    {"case_id": "GC23", "escalated": false, "lines": [
+      {"sku": "PB-CHOC-12", "quantity": 18, "reason_type": "velocity_reorder"},
+      {"sku": "PB-PB-12", "quantity": 18, "reason_type": "velocity_reorder"}
+    ]},
+
+    {"case_id": "GC24", "escalated": false, "lines": [{"sku": "PC-SC-8", "quantity": 6, "reason_type": "velocity_reorder"}],
+     "_seeded_failure": "Six cases against a 24-case chain MOQ. CRITICAL: the order cannot be submitted at all — the rep discovers this at the buyer's desk."},
+
+    {"case_id": "GC25", "escalated": false, "lines": [{"sku": "PP-VAN-2LB", "quantity": 18, "reason_type": "velocity_reorder"}]},
+    {"case_id": "GC26", "escalated": true, "lines": []}
+  ]
+}
